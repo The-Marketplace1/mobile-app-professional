@@ -27,85 +27,84 @@ import 'app_controller.dart';
 
 final sessionStoreProvider = Provider<SessionStore>(
   (ref) => const SecureSessionStorage(FlutterSecureStorage()),
-  );
+);
 
-  final apiClientProvider = Provider<ApiClient>(
-    (ref) => ApiClient(sessionStorage: ref.watch(sessionStoreProvider)),
-    );
+final apiClientProvider = Provider<ApiClient>(
+  (ref) => ApiClient(sessionStorage: ref.watch(sessionStoreProvider)),
+);
 
-    final authRepositoryProvider = Provider<AuthRepository>(
-      (ref) => AuthRepository(
-          apiClient: ref.watch(apiClientProvider),
-	      sessionStore: ref.watch(sessionStoreProvider),
-	        ),
-		);
+final authRepositoryProvider = Provider<AuthRepository>(
+  (ref) => AuthRepository(
+    apiClient: ref.watch(apiClientProvider),
+    sessionStore: ref.watch(sessionStoreProvider),
+  ),
+);
 
-		final profileRepositoryProvider = Provider(
-		  (ref) => ProfileRepository(ref.watch(apiClientProvider)),
-		  );
-		  final verificationRepositoryProvider = Provider(
-		    (ref) => VerificationRepository(ref.watch(apiClientProvider)),
-		    );
-		    final serviceRepositoryProvider = Provider(
-		      (ref) => ServiceRepository(ref.watch(apiClientProvider)),
-		      );
-		      final availabilityRepositoryProvider = Provider(
-		        (ref) => AvailabilityRepository(ref.watch(apiClientProvider)),
-			);
-			final bookingRepositoryProvider = Provider(
-			  (ref) => BookingRepository(ref.watch(apiClientProvider)),
-			  );
-			  final jobRepositoryProvider = Provider(
-			    (ref) => JobRepository(ref.watch(apiClientProvider)),
-			    );
-			    final communicationRepositoryProvider = Provider(
-			      (ref) => CommunicationRepository(ref.watch(apiClientProvider)),
-			      );
-			      final workspaceRepositoryProvider = Provider(
-			        (ref) => WorkspaceRepository(ref.watch(apiClientProvider)),
-				);
-				final earningsRepositoryProvider = Provider(
-				  (ref) => EarningsRepository(ref.watch(apiClientProvider)),
-				  );
-				  final withdrawalRepositoryProvider = Provider(
-				    (ref) => WithdrawalRepository(ref.watch(apiClientProvider)),
-				    );
-				    final reviewRepositoryProvider = Provider(
-				      (ref) => ReviewRepository(ref.watch(apiClientProvider)),
-				      );
-				      final disputeRepositoryProvider = Provider(
-				        (ref) => DisputeRepository(ref.watch(apiClientProvider)),
-					);
-					final settingsRepositoryProvider = Provider(
-					  (ref) => SettingsRepository(ref.watch(apiClientProvider)),
-					  );
+final profileRepositoryProvider = Provider(
+  (ref) => ProfileRepository(ref.watch(apiClientProvider)),
+);
+final verificationRepositoryProvider = Provider(
+  (ref) => VerificationRepository(ref.watch(apiClientProvider)),
+);
+final serviceRepositoryProvider = Provider(
+  (ref) => ServiceRepository(ref.watch(apiClientProvider)),
+);
+final availabilityRepositoryProvider = Provider(
+  (ref) => AvailabilityRepository(ref.watch(apiClientProvider)),
+);
+final bookingRepositoryProvider = Provider(
+  (ref) => BookingRepository(ref.watch(apiClientProvider)),
+);
+final jobRepositoryProvider = Provider(
+  (ref) => JobRepository(ref.watch(apiClientProvider)),
+);
+final communicationRepositoryProvider = Provider(
+  (ref) => CommunicationRepository(ref.watch(apiClientProvider)),
+);
+final workspaceRepositoryProvider = Provider(
+  (ref) => WorkspaceRepository(ref.watch(apiClientProvider)),
+);
+final earningsRepositoryProvider = Provider(
+  (ref) => EarningsRepository(ref.watch(apiClientProvider)),
+);
+final withdrawalRepositoryProvider = Provider(
+  (ref) => WithdrawalRepository(ref.watch(apiClientProvider)),
+);
+final reviewRepositoryProvider = Provider(
+  (ref) => ReviewRepository(ref.watch(apiClientProvider)),
+);
+final disputeRepositoryProvider = Provider(
+  (ref) => DisputeRepository(ref.watch(apiClientProvider)),
+);
+final settingsRepositoryProvider = Provider(
+  (ref) => SettingsRepository(ref.watch(apiClientProvider)),
+);
 
-					  final appControllerProvider = ChangeNotifierProvider<AppController>(
-					    (ref) => AppController(
-					        workspaceRepository: ref.watch(workspaceRepositoryProvider),
-						  ),
-						  );
+final appControllerProvider = ChangeNotifierProvider<AppController>(
+  (ref) => AppController(
+    workspaceRepository: ref.watch(workspaceRepositoryProvider),
+  ),
+);
 
-						  GoRouter createAppRouter(AppController controller) => GoRouter(
-						    initialLocation: '/auth',
-						      refreshListenable: controller,
-						        redirect: (context, state) {
-							    final isAuth = state.matchedLocation == '/auth';
-							        if (!controller.authenticated && !isAuth) return '/auth';
-								    if (controller.authenticated && isAuth) return '/';
-								        return null;
-									  },
-									    routes: [
-									        GoRoute(path: '/auth', builder: (context, state) => const AuthPage()),
-										    GoRoute(
-										          path: '/onboarding',
-											        builder: (context, state) => const OnboardingPage(),
-												    ),
-												        GoRoute(
-													      path: '/verification',
-													            builder: (context, state) => const VerificationPage(),
-														        ),
-															    GoRoute(path: '/', builder: (context, state) => const AppShell()),
-															      ],
-															      );
-
+GoRouter createAppRouter(AppController controller) => GoRouter(
+  initialLocation: '/auth',
+  refreshListenable: controller,
+  redirect: (context, state) {
+    final isAuth = state.matchedLocation == '/auth';
+    if (!controller.authenticated && !isAuth) return '/auth';
+    if (controller.authenticated && isAuth) return '/';
+    return null;
+  },
+  routes: [
+    GoRoute(path: '/auth', builder: (context, state) => const AuthPage()),
+    GoRoute(
+      path: '/onboarding',
+      builder: (context, state) => const OnboardingPage(),
+    ),
+    GoRoute(
+      path: '/verification',
+      builder: (context, state) => const VerificationPage(),
+    ),
+    GoRoute(path: '/', builder: (context, state) => const AppShell()),
+  ],
+);
