@@ -1,0 +1,2080 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Professional App API - all requests proxied through the API Gateway
+servers:
+  - url: /api/v1
+    description: Versioned API Gateway base path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+    description: Authentication
+  - name: profile
+    description: Professional profile
+  - name: onboarding
+    description: Professional onboarding
+  - name: services
+    description: Service management
+  - name: availability
+    description: Availability management
+  - name: bookings
+    description: Booking management
+  - name: jobs
+    description: Job management
+  - name: payments
+    description: Payment information
+  - name: withdrawals
+    description: Withdrawal requests
+  - name: disputes
+    description: Booking and payment disputes
+  - name: analytics
+    description: Business analytics
+  - name: conversations
+    description: Chat conversations
+  - name: notifications
+    description: Notifications
+  - name: reviews
+    description: Customer reviews
+  - name: calls
+    description: Call history
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  # ─── Auth ────────────────────────────────────────────────────────────────────
+
+  /auth/signin:
+    post:
+      operationId: signIn
+      tags: [auth]
+      summary: Sign in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignInInput"
+      responses:
+        "200":
+          description: Auth tokens
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthTokens"
+
+  /auth/signout:
+    post:
+      operationId: signOut
+      tags: [auth]
+      summary: Sign out
+      responses:
+        "204":
+          description: Signed out
+
+  /auth/refresh:
+    post:
+      operationId: refreshToken
+      tags: [auth]
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshInput"
+      responses:
+        "200":
+          description: New tokens
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthTokens"
+
+  /auth/forgot-password:
+    post:
+      operationId: forgotPassword
+      tags: [auth]
+      summary: Request password reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordInput"
+      responses:
+        "204":
+          description: Email sent
+
+  /auth/reset-password:
+    post:
+      operationId: resetPassword
+      tags: [auth]
+      summary: Reset password with token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordInput"
+      responses:
+        "204":
+          description: Password reset
+
+  /auth/verify-email:
+    post:
+      operationId: verifyEmail
+      tags: [auth]
+      summary: Verify email address
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyCodeInput"
+      responses:
+        "204":
+          description: Verified
+
+  /auth/verify-phone:
+    post:
+      operationId: verifyPhone
+      tags: [auth]
+      summary: Verify phone number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyCodeInput"
+      responses:
+        "204":
+          description: Verified
+
+  /auth/send-verification:
+    post:
+      operationId: sendVerification
+      tags: [auth]
+      summary: Send verification code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendVerificationInput"
+      responses:
+        "204":
+          description: Sent
+
+  /auth/me:
+    get:
+      operationId: getCurrentUser
+      tags: [auth]
+      summary: Get current authenticated professional
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Professional"
+
+  # ─── Profile ─────────────────────────────────────────────────────────────────
+
+  /profile:
+    get:
+      operationId: getProfile
+      tags: [profile]
+      summary: Get professional profile
+      responses:
+        "200":
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileFull"
+    patch:
+      operationId: updateProfile
+      tags: [profile]
+      summary: Update professional profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileUpdate"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileFull"
+
+  # ─── Onboarding ──────────────────────────────────────────────────────────────
+
+  /onboarding/status:
+    get:
+      operationId: getOnboardingStatus
+      tags: [onboarding]
+      summary: Get onboarding completion status
+      responses:
+        "200":
+          description: Onboarding status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OnboardingStatus"
+
+  /onboarding/banking:
+    post:
+      operationId: saveBankingDetails
+      tags: [onboarding]
+      summary: Save banking details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BankingInput"
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BankingDetails"
+
+  # ─── Services ────────────────────────────────────────────────────────────────
+
+  /services:
+    get:
+      operationId: listServices
+      tags: [services]
+      summary: List professional's services
+      responses:
+        "200":
+          description: Services list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+    post:
+      operationId: createService
+      tags: [services]
+      summary: Create a new service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceInput"
+      responses:
+        "201":
+          description: Created service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+
+  /services/{id}:
+    get:
+      operationId: getService
+      tags: [services]
+      summary: Get a service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+    patch:
+      operationId: updateService
+      tags: [services]
+      summary: Update a service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceUpdate"
+      responses:
+        "200":
+          description: Updated service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+    delete:
+      operationId: deleteService
+      tags: [services]
+      summary: Delete a service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  # ─── Availability ─────────────────────────────────────────────────────────────
+
+  /availability/schedule:
+    get:
+      operationId: getSchedule
+      tags: [availability]
+      summary: Get weekly working schedule
+      responses:
+        "200":
+          description: Schedule
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkingSchedule"
+    put:
+      operationId: updateSchedule
+      tags: [availability]
+      summary: Update weekly working schedule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkingSchedule"
+      responses:
+        "200":
+          description: Updated schedule
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkingSchedule"
+
+  /availability/calendar:
+    get:
+      operationId: getCalendar
+      tags: [availability]
+      summary: Get calendar availability for a date range
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+        - name: to
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Calendar slots
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CalendarDay"
+
+  /availability/holidays:
+    get:
+      operationId: listHolidays
+      tags: [availability]
+      summary: List blocked holiday periods
+      responses:
+        "200":
+          description: Holidays
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HolidayPeriod"
+    post:
+      operationId: addHoliday
+      tags: [availability]
+      summary: Add a holiday period
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HolidayInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HolidayPeriod"
+
+  /availability/holidays/{id}:
+    delete:
+      operationId: deleteHoliday
+      tags: [availability]
+      summary: Remove a holiday period
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  # ─── Bookings ────────────────────────────────────────────────────────────────
+
+  /bookings:
+    get:
+      operationId: listBookings
+      tags: [bookings]
+      summary: List bookings
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: from
+          in: query
+          schema:
+            type: string
+        - name: to
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: number
+        - name: offset
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Bookings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingListResponse"
+
+  /bookings/summary:
+    get:
+      operationId: getBookingsSummary
+      tags: [bookings]
+      summary: Get booking counts by status
+      responses:
+        "200":
+          description: Summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingsSummary"
+
+  /bookings/{id}:
+    get:
+      operationId: getBooking
+      tags: [bookings]
+      summary: Get booking details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingFull"
+
+  /bookings/{id}/accept:
+    post:
+      operationId: acceptBooking
+      tags: [bookings]
+      summary: Accept a booking request
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Updated booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingFull"
+
+  /bookings/{id}/decline:
+    post:
+      operationId: declineBooking
+      tags: [bookings]
+      summary: Decline a booking request
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeclineInput"
+      responses:
+        "200":
+          description: Updated booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingFull"
+
+  /bookings/{id}/reschedule:
+    post:
+      operationId: rescheduleBooking
+      tags: [bookings]
+      summary: Propose a reschedule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RescheduleInput"
+      responses:
+        "200":
+          description: Updated booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingFull"
+
+  # ─── Jobs ────────────────────────────────────────────────────────────────────
+
+  /jobs:
+    get:
+      operationId: listJobs
+      tags: [jobs]
+      summary: List jobs
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: number
+        - name: offset
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Job"
+
+  /jobs/{id}:
+    get:
+      operationId: getJob
+      tags: [jobs]
+      summary: Get job details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+
+  /jobs/{id}/start:
+    post:
+      operationId: startJob
+      tags: [jobs]
+      summary: Start a job
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Updated job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+
+  /jobs/{id}/pause:
+    post:
+      operationId: pauseJob
+      tags: [jobs]
+      summary: Pause a job
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Updated job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+
+  /jobs/{id}/resume:
+    post:
+      operationId: resumeJob
+      tags: [jobs]
+      summary: Resume a paused job
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Updated job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+
+  /jobs/{id}/complete:
+    post:
+      operationId: completeJob
+      tags: [jobs]
+      summary: Mark job as complete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompleteJobInput"
+      responses:
+        "200":
+          description: Updated job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+
+  # ─── Payments ────────────────────────────────────────────────────────────────
+
+  /payments:
+    get:
+      operationId: listPayments
+      tags: [payments]
+      summary: List payment history
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: number
+        - name: offset
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Payments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Payment"
+
+  /payments/earnings-summary:
+    get:
+      operationId: getEarningsSummary
+      tags: [payments]
+      summary: Get earnings overview
+      responses:
+        "200":
+          description: Earnings summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EarningsSummary"
+
+  /payments/escrow:
+    get:
+      operationId: listEscrow
+      tags: [payments]
+      summary: List escrow items
+      responses:
+        "200":
+          description: Escrow items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EscrowItem"
+
+  # ─── Withdrawals ─────────────────────────────────────────────────────────────
+
+  /withdrawals:
+    get:
+      operationId: listWithdrawals
+      tags: [withdrawals]
+      summary: List withdrawal history
+      responses:
+        "200":
+          description: Withdrawals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Withdrawal"
+    post:
+      operationId: requestWithdrawal
+      tags: [withdrawals]
+      summary: Request a withdrawal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WithdrawalInput"
+      responses:
+        "201":
+          description: Withdrawal created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Withdrawal"
+
+  /withdrawals/{id}:
+    get:
+      operationId: getWithdrawal
+      tags: [withdrawals]
+      summary: Get withdrawal details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Withdrawal
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Withdrawal"
+
+  # ─── Disputes ────────────────────────────────────────────────────────────────
+
+  /disputes:
+    get:
+      operationId: listDisputes
+      tags: [disputes]
+      summary: List disputes related to the professional
+      responses:
+        "200":
+          description: Disputes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Dispute"
+    post:
+      operationId: createDispute
+      tags: [disputes]
+      summary: Create a dispute request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DisputeInput"
+      responses:
+        "201":
+          description: Created dispute
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dispute"
+
+  /disputes/{id}:
+    get:
+      operationId: getDispute
+      tags: [disputes]
+      summary: Get dispute details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Dispute
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dispute"
+
+  # ─── Analytics ───────────────────────────────────────────────────────────────
+
+  /analytics/dashboard:
+    get:
+      operationId: getDashboardAnalytics
+      tags: [analytics]
+      summary: Get full dashboard analytics
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Analytics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardAnalytics"
+
+  /analytics/earnings-chart:
+    get:
+      operationId: getEarningsChart
+      tags: [analytics]
+      summary: Get earnings chart data points
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Chart data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChartDataPoint"
+
+  /analytics/bookings-chart:
+    get:
+      operationId: getBookingsChart
+      tags: [analytics]
+      summary: Get bookings chart data points
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Chart data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChartDataPoint"
+
+  # ─── Conversations / Chat ─────────────────────────────────────────────────────
+
+  /conversations:
+    get:
+      operationId: listConversations
+      tags: [conversations]
+      summary: List conversations
+      responses:
+        "200":
+          description: Conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Conversation"
+
+  /conversations/{id}:
+    get:
+      operationId: getConversation
+      tags: [conversations]
+      summary: Get conversation details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Conversation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversation"
+
+  /conversations/{id}/messages:
+    get:
+      operationId: fetchMessages
+      tags: [conversations]
+      summary: Fetch messages in a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+    post:
+      operationId: sendMessage
+      tags: [conversations]
+      summary: Send a message
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageInput"
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
+  /conversations/{id}/read:
+    post:
+      operationId: markConversationRead
+      tags: [conversations]
+      summary: Mark conversation as read
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Marked
+
+  # ─── Notifications ────────────────────────────────────────────────────────────
+
+  /notifications:
+    get:
+      operationId: listNotifications
+      tags: [notifications]
+      summary: List notifications
+      parameters:
+        - name: unread
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+
+  /notifications/{id}/read:
+    post:
+      operationId: markNotificationRead
+      tags: [notifications]
+      summary: Mark notification as read
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Marked
+
+  /notifications/read-all:
+    post:
+      operationId: markAllNotificationsRead
+      tags: [notifications]
+      summary: Mark all notifications as read
+      responses:
+        "204":
+          description: Marked
+
+  /notifications/preferences:
+    get:
+      operationId: getNotificationPreferences
+      tags: [notifications]
+      summary: Get notification preferences
+      responses:
+        "200":
+          description: Preferences
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationPreferences"
+    put:
+      operationId: updateNotificationPreferences
+      tags: [notifications]
+      summary: Update notification preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationPreferences"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationPreferences"
+
+  /notifications/unread-count:
+    get:
+      operationId: getUnreadNotificationCount
+      tags: [notifications]
+      summary: Get unread notification count
+      responses:
+        "200":
+          description: Count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnreadCount"
+
+  # ─── Reviews ─────────────────────────────────────────────────────────────────
+
+  /reviews:
+    get:
+      operationId: listReviews
+      tags: [reviews]
+      summary: List reviews received
+      parameters:
+        - name: rating
+          in: query
+          schema:
+            type: number
+        - name: limit
+          in: query
+          schema:
+            type: number
+        - name: offset
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Reviews
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewListResponse"
+
+  /reviews/stats:
+    get:
+      operationId: getReviewStats
+      tags: [reviews]
+      summary: Get review statistics
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewStats"
+
+  /reviews/{id}/respond:
+    post:
+      operationId: respondToReview
+      tags: [reviews]
+      summary: Respond to a review
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewResponseInput"
+      responses:
+        "200":
+          description: Updated review
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+
+  # ─── Calls ────────────────────────────────────────────────────────────────────
+
+  /calls:
+    get:
+      operationId: listCalls
+      tags: [calls]
+      summary: List call history
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: number
+        - name: offset
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Calls
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CallRecord"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+
+    # ─── Auth ──────────────────────────────────────────────────────────────────
+
+    SignInInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        mfaCode:
+          type: ["string", "null"]
+
+    RefreshInput:
+      type: object
+      required: [refreshToken]
+      properties:
+        refreshToken:
+          type: string
+
+    ForgotPasswordInput:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+
+    ResetPasswordInput:
+      type: object
+      required: [token, password]
+      properties:
+        token:
+          type: string
+        password:
+          type: string
+
+    VerifyCodeInput:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+
+    SendVerificationInput:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+
+    AuthTokens:
+      type: object
+      required: [accessToken, tokenType]
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: ["string", "null"]
+        tokenType:
+          type: string
+        expiresIn:
+          type: ["number", "null"]
+
+    Professional:
+      type: object
+      required: [id, email, firstName, lastName, verificationStatus]
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phone:
+          type: ["string", "null"]
+        photoUrl:
+          type: ["string", "null"]
+        verificationStatus:
+          type: string
+        onboardingCompleted:
+          type: boolean
+
+    # ─── Profile ───────────────────────────────────────────────────────────────
+
+    ProfileFull:
+      type: object
+      required: [id, firstName, lastName, email, verificationStatus]
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        photoUrl:
+          type: ["string", "null"]
+        bio:
+          type: ["string", "null"]
+        businessName:
+          type: ["string", "null"]
+        serviceArea:
+          type: ["string", "null"]
+        languages:
+          type: array
+          items:
+            type: string
+        qualifications:
+          type: array
+          items:
+            type: string
+        verificationStatus:
+          type: string
+        rating:
+          type: ["number", "null"]
+        totalReviews:
+          type: number
+        memberSince:
+          type: string
+
+    ProfileUpdate:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phone:
+          type: string
+        bio:
+          type: string
+        businessName:
+          type: string
+        serviceArea:
+          type: string
+        languages:
+          type: array
+          items:
+            type: string
+        qualifications:
+          type: array
+          items:
+            type: string
+
+    # ─── Onboarding ────────────────────────────────────────────────────────────
+
+    OnboardingStatus:
+      type: object
+      required: [completed, steps]
+      properties:
+        completed:
+          type: boolean
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/OnboardingStep"
+
+    OnboardingStep:
+      type: object
+      required: [key, label, completed]
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        completed:
+          type: boolean
+
+    BankingInput:
+      type: object
+      required: [accountHolderName, accountNumber, routingNumber]
+      properties:
+        accountHolderName:
+          type: string
+        accountNumber:
+          type: string
+        routingNumber:
+          type: string
+        bankName:
+          type: string
+
+    BankingDetails:
+      type: object
+      required: [id, accountHolderName, maskedAccount]
+      properties:
+        id:
+          type: string
+        accountHolderName:
+          type: string
+        maskedAccount:
+          type: string
+        bankName:
+          type: ["string", "null"]
+
+    # ─── Services ──────────────────────────────────────────────────────────────
+
+    Service:
+      type: object
+      required: [id, title, category, price, duration, isActive]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        category:
+          type: string
+        price:
+          type: number
+        priceType:
+          type: string
+        duration:
+          type: number
+        images:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+
+    ServiceInput:
+      type: object
+      required: [title, category, price, duration]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        price:
+          type: number
+        priceType:
+          type: string
+        duration:
+          type: number
+
+    ServiceUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        price:
+          type: number
+        priceType:
+          type: string
+        duration:
+          type: number
+        isActive:
+          type: boolean
+
+    # ─── Availability ──────────────────────────────────────────────────────────
+
+    WorkingSchedule:
+      type: object
+      required: [days]
+      properties:
+        days:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkingDay"
+
+    WorkingDay:
+      type: object
+      required: [dayOfWeek, isWorking]
+      properties:
+        dayOfWeek:
+          type: number
+        isWorking:
+          type: boolean
+        startTime:
+          type: ["string", "null"]
+        endTime:
+          type: ["string", "null"]
+        breaks:
+          type: array
+          items:
+            $ref: "#/components/schemas/BreakPeriod"
+
+    BreakPeriod:
+      type: object
+      required: [startTime, endTime]
+      properties:
+        startTime:
+          type: string
+        endTime:
+          type: string
+
+    CalendarDay:
+      type: object
+      required: [date, isAvailable]
+      properties:
+        date:
+          type: string
+        isAvailable:
+          type: boolean
+        slots:
+          type: array
+          items:
+            type: string
+        bookingCount:
+          type: number
+
+    HolidayPeriod:
+      type: object
+      required: [id, from, to, label]
+      properties:
+        id:
+          type: string
+        from:
+          type: string
+        to:
+          type: string
+        label:
+          type: string
+
+    HolidayInput:
+      type: object
+      required: [from, to, label]
+      properties:
+        from:
+          type: string
+        to:
+          type: string
+        label:
+          type: string
+
+    # ─── Bookings ──────────────────────────────────────────────────────────────
+
+    BookingListResponse:
+      type: object
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Booking"
+        total:
+          type: number
+
+    Booking:
+      type: object
+      required: [id, status, scheduledAt, service, customer]
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+        scheduledAt:
+          type: string
+        durationMinutes:
+          type: number
+        service:
+          $ref: "#/components/schemas/ServiceRef"
+        customer:
+          $ref: "#/components/schemas/CustomerRef"
+        totalAmount:
+          type: number
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    BookingFull:
+      type: object
+      required: [id, status, scheduledAt, service, customer]
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+        scheduledAt:
+          type: string
+        durationMinutes:
+          type: number
+        service:
+          $ref: "#/components/schemas/ServiceRef"
+        customer:
+          $ref: "#/components/schemas/CustomerRef"
+        totalAmount:
+          type: number
+        notes:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        lat:
+          type: ["number", "null"]
+        lng:
+          type: ["number", "null"]
+        timeline:
+          type: array
+          items:
+            $ref: "#/components/schemas/BookingEvent"
+        createdAt:
+          type: string
+
+    BookingEvent:
+      type: object
+      required: [event, occurredAt]
+      properties:
+        event:
+          type: string
+        occurredAt:
+          type: string
+        note:
+          type: ["string", "null"]
+
+    BookingsSummary:
+      type: object
+      required: [pending, accepted, active, completed, cancelled]
+      properties:
+        pending:
+          type: number
+        accepted:
+          type: number
+        active:
+          type: number
+        completed:
+          type: number
+        cancelled:
+          type: number
+
+    ServiceRef:
+      type: object
+      required: [id, title]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        category:
+          type: string
+
+    CustomerRef:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        photoUrl:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+
+    DeclineInput:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+
+    RescheduleInput:
+      type: object
+      required: [proposedAt]
+      properties:
+        proposedAt:
+          type: string
+        message:
+          type: string
+
+    # ─── Jobs ──────────────────────────────────────────────────────────────────
+
+    Job:
+      type: object
+      required: [id, status, booking]
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+        booking:
+          $ref: "#/components/schemas/Booking"
+        startedAt:
+          type: ["string", "null"]
+        completedAt:
+          type: ["string", "null"]
+        evidenceUrls:
+          type: array
+          items:
+            type: string
+        notes:
+          type: ["string", "null"]
+
+    CompleteJobInput:
+      type: object
+      properties:
+        notes:
+          type: string
+
+    # ─── Payments ──────────────────────────────────────────────────────────────
+
+    Payment:
+      type: object
+      required: [id, amount, type, status, createdAt]
+      properties:
+        id:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+        bookingId:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    EarningsSummary:
+      type: object
+      required: [availableBalance, pendingBalance, totalEarned]
+      properties:
+        availableBalance:
+          type: number
+        pendingBalance:
+          type: number
+        totalEarned:
+          type: number
+        currency:
+          type: string
+        thisMonth:
+          type: number
+        lastMonth:
+          type: number
+
+    EscrowItem:
+      type: object
+      required: [id, amount, status, releaseDate]
+      properties:
+        id:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        status:
+          type: string
+        releaseDate:
+          type: string
+        bookingId:
+          type: string
+
+    # ─── Withdrawals ───────────────────────────────────────────────────────────
+
+    Withdrawal:
+      type: object
+      required: [id, amount, status, requestedAt]
+      properties:
+        id:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        status:
+          type: string
+        requestedAt:
+          type: string
+        completedAt:
+          type: ["string", "null"]
+        bankAccount:
+          type: ["string", "null"]
+
+    WithdrawalInput:
+      type: object
+      required: [amount]
+      properties:
+        amount:
+          type: number
+        bankAccountId:
+          type: string
+
+    # ─── Disputes ──────────────────────────────────────────────────────────────
+
+    Dispute:
+      type: object
+      required: [id, status, subject, createdAt]
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+        subject:
+          type: string
+        description:
+          type: [ "string", "null" ]
+        bookingId:
+          type: [ "string", "null" ]
+        createdAt:
+          type: string
+        updatedAt:
+          type: [ "string", "null" ]
+
+    DisputeInput:
+      type: object
+      required: [subject, description]
+      properties:
+        subject:
+          type: string
+        description:
+          type: string
+        bookingId:
+          type: string
+
+    # ─── Analytics ─────────────────────────────────────────────────────────────
+
+    DashboardAnalytics:
+      type: object
+      required: [totalBookings, completionRate, averageRating, responseTime]
+      properties:
+        totalBookings:
+          type: number
+        completionRate:
+          type: number
+        averageRating:
+          type: number
+        responseTime:
+          type: number
+        topServices:
+          type: array
+          items:
+            $ref: "#/components/schemas/ServiceStats"
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActivityItem"
+
+    ServiceStats:
+      type: object
+      required: [serviceId, title, bookingCount]
+      properties:
+        serviceId:
+          type: string
+        title:
+          type: string
+        bookingCount:
+          type: number
+        revenue:
+          type: number
+
+    ActivityItem:
+      type: object
+      required: [type, description, occurredAt]
+      properties:
+        type:
+          type: string
+        description:
+          type: string
+        occurredAt:
+          type: string
+
+    ChartDataPoint:
+      type: object
+      required: [label, value]
+      properties:
+        label:
+          type: string
+        value:
+          type: number
+
+    # ─── Conversations ─────────────────────────────────────────────────────────
+
+    Conversation:
+      type: object
+      required: [id, customer, lastMessageAt]
+      properties:
+        id:
+          type: string
+        customer:
+          $ref: "#/components/schemas/CustomerRef"
+        lastMessage:
+          type: ["string", "null"]
+        lastMessageAt:
+          type: string
+        unreadCount:
+          type: number
+        isArchived:
+          type: boolean
+        isOnline:
+          type: boolean
+
+    Message:
+      type: object
+      required: [id, content, senderType, sentAt]
+      properties:
+        id:
+          type: string
+        content:
+          type: string
+        senderType:
+          type: string
+        messageType:
+          type: string
+        attachmentUrl:
+          type: ["string", "null"]
+        isRead:
+          type: boolean
+        sentAt:
+          type: string
+
+    MessageInput:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+        messageType:
+          type: string
+
+    # ─── Notifications ─────────────────────────────────────────────────────────
+
+    Notification:
+      type: object
+      required: [id, type, title, isRead, createdAt]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        title:
+          type: string
+        body:
+          type: ["string", "null"]
+        isRead:
+          type: boolean
+        entityId:
+          type: ["string", "null"]
+        entityType:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    NotificationPreferences:
+      type: object
+      properties:
+        pushEnabled:
+          type: boolean
+        emailEnabled:
+          type: boolean
+        bookingRequests:
+          type: boolean
+        bookingUpdates:
+          type: boolean
+        payments:
+          type: boolean
+        messages:
+          type: boolean
+        reviews:
+          type: boolean
+        marketing:
+          type: boolean
+
+    UnreadCount:
+      type: object
+      required: [count]
+      properties:
+        count:
+          type: number
+
+    # ─── Reviews ───────────────────────────────────────────────────────────────
+
+    ReviewListResponse:
+      type: object
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Review"
+        total:
+          type: number
+
+    Review:
+      type: object
+      required: [id, rating, customer, createdAt]
+      properties:
+        id:
+          type: string
+        rating:
+          type: number
+        comment:
+          type: ["string", "null"]
+        response:
+          type: ["string", "null"]
+        customer:
+          $ref: "#/components/schemas/CustomerRef"
+        service:
+          $ref: "#/components/schemas/ServiceRef"
+        createdAt:
+          type: string
+
+    ReviewStats:
+      type: object
+      required: [averageRating, totalReviews]
+      properties:
+        averageRating:
+          type: number
+        totalReviews:
+          type: number
+        fiveStars:
+          type: number
+        fourStars:
+          type: number
+        threeStars:
+          type: number
+        twoStars:
+          type: number
+        oneStar:
+          type: number
+
+    ReviewResponseInput:
+      type: object
+      required: [response]
+      properties:
+        response:
+          type: string
+
+    # ─── Calls ─────────────────────────────────────────────────────────────────
+
+    CallRecord:
+      type: object
+      required: [id, direction, status, startedAt]
+      properties:
+        id:
+          type: string
+        direction:
+          type: string
+        status:
+          type: string
+        durationSeconds:
+          type: ["number", "null"]
+        customer:
+          $ref: "#/components/schemas/CustomerRef"
+        startedAt:
+          type: string
